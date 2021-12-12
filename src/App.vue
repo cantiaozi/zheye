@@ -1,36 +1,71 @@
 <template>
   <div class="container">
-    <column-list :list="list"></column-list>
+    <global-header :user="user" />
+    <!-- <column-list :list="list" /> -->
+    <form action="">
+      <div class="mb-3">
+        <label class="form-label">邮箱地址</label>
+        <validate-input
+          :rule="emailRules" v-model="inputValue"
+          placeholder="请输入邮箱地址"
+          type="text"
+        />
+        {{inputValue}}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">密码</label>
+        <validate-input
+          type="password"
+          placeholder="请输入密码"
+          :rule="passwordRules"
+          v-model="passwordVal"
+        />
+      </div>
+    </form>
   </div>
 </template>
 
 <script lang="ts">
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { defineComponent } from 'vue'
-import ColumnList, { ListData } from './components/ColumnList.vue'
+import { defineComponent, reactive, ref } from 'vue'
+import GlobalHeader, { UserProps } from './components/GlobalHeader.vue'
+import validateInput, { InputRule } from './components/ValidateInput.vue'
 
-const testData: ListData[] = [
-  {
-    id: 1,
-    title: 'test1的专栏',
-    description: '这是的test1专栏，有一段非常有意思的简介，可以更新一下欧',
-    avatar: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5ee22dd58b3c4520912b9470.jpg?x-oss-process=image/resize,m_pad,h_100,w_100'
-  },
-  {
-    id: 2,
-    title: 'test2的专栏',
-    description: '这是的test2专栏，有一段非常有意思的简介，可以更新一下欧',
-    avatar: 'http://vue-maker.oss-cn-hangzhou.aliyuncs.com/vue-marker/5ee22dd58b3c4520912b9470.jpg?x-oss-process=image/resize,m_pad,h_100,w_100'
-  }
+const emailRules: InputRule[] = [
+  { type: 'required', message: '电子邮箱地址不能为空' },
+  { type: 'email', message: '请输入正确的电子邮箱格式' }
 ]
+
+const testUser: UserProps = {
+  isLogin: true,
+  id: 1,
+  name: 'liuyong'
+}
 export default defineComponent({
   name: 'App',
   components: {
-    ColumnList
+    // ColumnList,
+    GlobalHeader,
+    validateInput
   },
   setup () {
+    const emailRef = reactive({
+      val: '',
+      error: false,
+      message: ''
+    })
+    const inputValue = ref('')
+    const passwordVal = ref('')
+    const passwordRules: InputRule[] = [
+      { type: 'required', message: '密码不能为空' }
+    ]
     return {
-      list: testData
+      user: testUser,
+      emailRef,
+      emailRules,
+      inputValue,
+      passwordVal,
+      passwordRules
     }
   }
 })
