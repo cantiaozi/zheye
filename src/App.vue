@@ -2,7 +2,7 @@
   <div class="container">
     <global-header :user="user" />
     <!-- <column-list :list="list" /> -->
-    <form action="">
+    <validate-form action="" @validate-form="validateForm">
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
         <validate-input
@@ -10,7 +10,6 @@
           placeholder="请输入邮箱地址"
           type="text"
         />
-        {{inputValue}}
       </div>
       <div class="mb-3">
         <label class="form-label">密码</label>
@@ -21,7 +20,7 @@
           v-model="passwordVal"
         />
       </div>
-    </form>
+    </validate-form>
   </div>
 </template>
 
@@ -30,6 +29,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { defineComponent, reactive, ref } from 'vue'
 import GlobalHeader, { UserProps } from './components/GlobalHeader.vue'
 import validateInput, { InputRule } from './components/ValidateInput.vue'
+import ValidateForm from './components/ValidateForm.vue'
 
 const emailRules: InputRule[] = [
   { type: 'required', message: '电子邮箱地址不能为空' },
@@ -46,7 +46,8 @@ export default defineComponent({
   components: {
     // ColumnList,
     GlobalHeader,
-    validateInput
+    validateInput,
+    ValidateForm
   },
   setup () {
     const emailRef = reactive({
@@ -59,13 +60,18 @@ export default defineComponent({
     const passwordRules: InputRule[] = [
       { type: 'required', message: '密码不能为空' }
     ]
+    const validateForm = (result: boolean) :void => {
+      console.log('result', result)
+    }
+
     return {
       user: testUser,
       emailRef,
       emailRules,
       inputValue,
       passwordVal,
-      passwordRules
+      passwordRules,
+      validateForm
     }
   }
 })
