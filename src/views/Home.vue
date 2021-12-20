@@ -17,17 +17,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { testData } from './testData'
+import { computed, defineComponent } from 'vue'
 import ColumnList from '../components/ColumnList.vue'
+import { useStore } from 'vuex'
+import { GlobalDataProps } from '../store'
 export default defineComponent({
   name: 'Home',
   components: {
     ColumnList
   },
   setup () {
+    const store = useStore<GlobalDataProps>()
+    const list = computed(() => {
+      return store.state.column
+    })
     return {
-      list: testData
+      list
     }
   }
 })

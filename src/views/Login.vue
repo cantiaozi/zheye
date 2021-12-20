@@ -28,6 +28,7 @@ import { defineComponent, ref } from 'vue'
 import ValidateInput, { InputRule } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   name: 'Login',
@@ -46,10 +47,12 @@ export default defineComponent({
       { type: 'required', message: '密码不能为空' }
     ]
     const router = useRouter()
+    const store = useStore()
     const onFormSubmit = (result: boolean) => {
       console.log('result', result)
       if (result) {
-        router.push('/column/1')
+        store.commit('login')
+        router.push('/')
       }
     }
     return {
