@@ -22,7 +22,7 @@ type Events = {
 export const emitter: Emitter<Events> = mitt<Events>()
 export default defineComponent({
   name: 'ValidateForm',
-  emits: ['validate-form'],
+  emits: ['form-submit'],
   setup (props, context) {
     const funcArr: ValidateFunc[] = []
     const submitForm = () => {
@@ -31,7 +31,7 @@ export default defineComponent({
       }).every(result => {
         return result
       })
-      context.emit('validate-form', validateResult)
+      context.emit('form-submit', validateResult)
     }
     const callback = (validateFunc: ValidateFunc): void => {
       funcArr.push(validateFunc)
