@@ -17,7 +17,7 @@ export interface GlobalDataProps {
 const store = createStore<GlobalDataProps>({
   state: {
     user: {
-      isLogin: false,
+      isLogin: true,
       name: 'liuyong',
       id: 1,
       columnId: 1
