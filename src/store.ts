@@ -4,13 +4,14 @@ import { ColumnProps, PostProps, testData, testPosts } from './views/testData'
 export interface UserProps {
   isLogin: boolean,
   id?: number,
-  name?: string
+  name?: string,
+  columnId?: number
 }
 
 export interface GlobalDataProps {
   user: UserProps
-  column: ColumnProps[]
-  list: PostProps[]
+  columns: ColumnProps[]
+  posts: PostProps[]
 }
 
 const store = createStore<GlobalDataProps>({
@@ -18,27 +19,31 @@ const store = createStore<GlobalDataProps>({
     user: {
       isLogin: false,
       name: 'liuyong',
-      id: 1
+      id: 1,
+      columnId: 1
     },
-    column: testData,
-    list: testPosts
+    columns: testData,
+    posts: testPosts
   },
   mutations: {
     login (state) {
       state.user.isLogin = true
+    },
+    createPost (state, newPost) {
+      state.posts.push(newPost)
     }
   },
   getters: {
     getColumnById (state) {
       return (id: number) : ColumnProps | undefined => {
-        return state.column.find(item => {
+        return state.columns.find(item => {
           return item.id === id
         })
       }
     },
     getPostsByCId (state) {
       return (cid: number) : PostProps[] => {
-        return state.list.filter(item => {
+        return state.posts.filter(item => {
           return item.columnId === cid
         })
       }

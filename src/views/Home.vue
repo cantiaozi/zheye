@@ -29,7 +29,7 @@ export default defineComponent({
   setup () {
     const store = useStore<GlobalDataProps>()
     const list = computed(() => {
-      return store.state.column
+      return store.state.columns
     })
     return {
       list

@@ -5,6 +5,7 @@ import store from './store'
 import Home from './views/Home.vue'
 import Login from './views/Login.vue'
 import ColumnDetail from './views/ColumnDetail.vue'
+import CreatePost from './views/CreatePost.vue'
 
 const history = createWebHistory()
 const router: Router = createRouter({
@@ -24,8 +25,21 @@ const router: Router = createRouter({
       name: 'column',
       path: '/column/:id',
       component: ColumnDetail
+    },
+    {
+      path: '/create',
+      name: 'create',
+      component: CreatePost
     }
   ]
+})
+router.beforeEach((to, from, next) => {
+  console.log('to from', to, from)
+  if (to.path !== '/login' && !store.state.user.isLogin) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 const app = createApp(App)
