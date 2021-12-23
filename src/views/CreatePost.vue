@@ -54,7 +54,6 @@ export default defineComponent({
       { type: 'required', message: '文章详情不能为空' }
     ]
     const onFormSubmit = (result: boolean) => {
-      debugger
       if (result) {
         const currentId = store.state.user.columnId
         if (currentId) {
