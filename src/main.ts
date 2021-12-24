@@ -6,6 +6,7 @@ import axios from 'axios'
 
 axios.defaults.baseURL = 'http://apis.imooc.com/api/'
 axios.interceptors.request.use((config) => {
+  store.commit('setLoading', true)
   config.params = {
     ...config.params,
     icode: '8D22E4B7CADF31AE'
@@ -20,9 +21,10 @@ axios.interceptors.request.use((config) => {
   }
   return config
 })
-// axios.get('/columns?currentPage=1&pageSize=5').then(res => {
-//   console.log(res)
-// })
+axios.interceptors.response.use((config) => {
+  store.commit('setLoading', false)
+  return config
+})
 
 const app = createApp(App)
 app.use(store)
