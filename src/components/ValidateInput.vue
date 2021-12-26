@@ -26,8 +26,9 @@
 import { defineComponent, onMounted, PropType, reactive } from 'vue'
 import { emitter } from './ValidateForm.vue'
 export interface InputRule {
-  type: 'required' | 'email',
-  message: string
+  type: 'required' | 'email' | 'custom',
+  message: string,
+  validator?: () => boolean
 }
 type tagFlag = 'input' | 'textarea'
 export default defineComponent({
@@ -66,6 +67,13 @@ export default defineComponent({
             case 'email':
               if (!emailReg.test(inputRef.val)) {
                 passed = false
+                inputRef.error = false
+                inputRef.message = rule.message
+              }
+              break
+            case 'custom':
+              passed = rule.validator ? rule.validator() : true
+              if (!passed) {
                 inputRef.error = false
                 inputRef.message = rule.message
               }
