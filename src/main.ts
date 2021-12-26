@@ -14,16 +14,30 @@ axios.interceptors.request.use((config) => {
   // 其他请求，添加到 body 中
   // 如果是上传文件，添加到 FormData 中
   if (config.data instanceof FormData) {
-    config.data.append('icode', '******')
+    config.data.append('icode', '8D22E4B7CADF31AE')
   } else {
   // 普通的 body 对象，添加到 data 中
-    config.data = { ...config.data, icode: '******' }
+    config.data = { ...config.data, icode: '8D22E4B7CADF31AE' }
   }
+  store.commit('setError', {
+    status: false,
+    message: ''
+  })
   return config
 })
 axios.interceptors.response.use((config) => {
-  store.commit('setLoading', false)
+  setTimeout(() => {
+    store.commit('setLoading', false)
+  }, 2000)
   return config
+}, (error) => {
+  console.log(error.response)
+  store.commit('setError', {
+    status: true,
+    message: error.response.data.error
+  })
+  store.commit('setLoading', false)
+  return Promise.reject(error.response)
 })
 
 const app = createApp(App)

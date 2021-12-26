@@ -33,8 +33,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import ValidateInput, { InputRule } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
-import { GlobalDataProps } from '../store'
-import { PostProps } from './testData'
+import { GlobalDataProps, PostProps } from '../store'
 
 export default defineComponent({
   name: 'Login',
@@ -55,14 +54,14 @@ export default defineComponent({
     ]
     const onFormSubmit = (result: boolean) => {
       if (result) {
-        const currentId = store.state.user.columnId
+        const currentId = store.state.user.column
         if (currentId) {
           const newPost: PostProps = {
-            id: new Date().getTime(),
+            _id: new Date().getTime().toString(),
             title: titleVal.value,
             content: contentVal.value,
             createdAt: new Date().toString(),
-            columnId: currentId
+            column: currentId
           }
           store.commit('createPost', newPost)
           router.push(`/column/${currentId}`)

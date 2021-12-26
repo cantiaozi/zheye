@@ -3,9 +3,16 @@ import { Commit, createStore } from 'vuex'
 
 export interface UserProps {
   isLogin: boolean,
-  id?: number,
-  name?: string,
-  columnId?: number
+  _id?: string,
+  nickName?: string,
+  column?: string,
+  email?: string,
+  description?: string
+}
+
+export interface ErrorProps {
+  status: boolean,
+  message?: string,
 }
 
 export interface ImageProps {
@@ -35,30 +42,38 @@ export interface GlobalDataProps {
   user: UserProps
   columns: ColumnProps[]
   posts: PostProps[]
-  isLoading: boolean
+  isLoading: boolean,
+  token: string,
+  error: ErrorProps
 }
 
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
   const response = await axios.get(url)
   commit(mutationName, response.data.data)
 }
+const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload: any) => {
+  const response = await axios.post(url, payload)
+  commit(mutationName, response.data)
+  return response
+}
 
 const store = createStore<GlobalDataProps>({
   state: {
     user: {
-      isLogin: true,
-      name: 'liuyong',
-      id: 1,
-      columnId: 1
+      isLogin: false,
+      nickName: 'liuyong',
+      _id: '',
+      column: ''
     },
     columns: [],
     posts: [],
-    isLoading: false
+    isLoading: false,
+    token: localStorage.getItem('token') || '',
+    error: {
+      status: false
+    }
   },
   mutations: {
-    login (state) {
-      state.user.isLogin = true
-    },
     createPost (state, newPost) {
       state.posts.push(newPost)
     },
@@ -73,6 +88,21 @@ const store = createStore<GlobalDataProps>({
     },
     setLoading (state, status) {
       state.isLoading = status
+    },
+    login (state, rawData) {
+      const { token } = rawData.data
+      localStorage.setItem('token', token)
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
+      state.token = token
+    },
+    fetchCurrentUser (state, rawData) {
+      state.user = {
+        isLogin: true,
+        ...rawData
+      }
+    },
+    setError (state, rawData: ErrorProps) {
+      state.error = rawData
     }
   },
   actions: {
@@ -84,6 +114,17 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPosts ({ commit }, cid) {
       getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+    },
+    login ({ commit }, payload) {
+      return postAndCommit('/user/login', 'login', commit, payload)
+    },
+    fetchCurrentUser ({ commit }) {
+      getAndCommit('/user/current', 'fetchCurrentUser', commit)
+    },
+    loginAndFetch ({ dispatch }, payload) {
+      return dispatch('login', payload).then(() => {
+        return dispatch('fetchCurrentUser')
+      })
     }
   },
   getters: {
