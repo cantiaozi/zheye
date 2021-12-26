@@ -15,7 +15,7 @@
           <router-link class="dropdown-item" to="/create">新建文章</router-link>
         </dropdown-item>
          <dropdown-item disabled><a href="#" class="dropdown-item">编辑资料</a></dropdown-item>
-         <dropdown-item><a href="#" class="dropdown-item">退出登陆</a></dropdown-item>
+         <dropdown-item><a href="#" class="dropdown-item" @click="logout">退出登陆</a></dropdown-item>
       </dropdown>
     </ul>
   </nav>
@@ -25,7 +25,8 @@
 import { defineComponent, PropType } from 'vue'
 import Dropdown from './Dropdown.vue'
 import DropdownItem from './DropdownItem.vue'
-import { UserProps } from '../store'
+import { UserProps, GlobalDataProps } from '../store'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   name: 'GlobalHeader',
@@ -38,10 +39,16 @@ export default defineComponent({
   components: {
     Dropdown,
     DropdownItem
+  },
+  setup () {
+    const store = useStore<GlobalDataProps>()
+    const logout = () => {
+      store.commit('logout')
+    }
+    return {
+      logout
+    }
   }
-  // setup() {
-
-  // }
 })
 </script>
 
