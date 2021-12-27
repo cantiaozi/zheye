@@ -46,6 +46,11 @@ export interface GlobalDataProps {
   token: string,
   error: ErrorProps
 }
+export interface ResponseType<T> {
+  code: number,
+  msg: string,
+  data: T
+}
 
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
   const response = await axios.get(url)

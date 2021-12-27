@@ -1,7 +1,8 @@
 <template>
   <div class="create-post-page">
     <h4>新建文章</h4>
-    <input type="file" @change="handFileChange"/>
+    <!-- <input type="file" @change="handFileChange"/> -->
+    <Uploader action="/upload" @file-uploaded="onFileUploaded"/>
     <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">文章标题：</label>
@@ -34,14 +35,17 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import ValidateInput, { InputRule } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
-import { GlobalDataProps, PostProps } from '../store'
+import Uploader from '../components/Uploader.vue'
+import createMessage from '../components/createMessage'
+import { GlobalDataProps, PostProps, ResponseType, ImageProps } from '../store'
 import axios from 'axios'
 
 export default defineComponent({
   name: 'Login',
   components: {
     ValidateInput,
-    ValidateForm
+    ValidateForm,
+    Uploader
   },
   setup () {
     const titleVal = ref('')
@@ -83,13 +87,25 @@ export default defineComponent({
         console.log('upload', res)
       })
     }
+    const beforeUpload = (file: File): boolean => {
+      const isJPG = file.type === 'image/jpeg'
+      if (!isJPG) {
+        createMessage('上传图片只能是JPG格式', 'error')
+      }
+      return isJPG
+    }
+    const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
+      createMessage(`上传图片ID ${rawData.data._id}`, 'success')
+    }
     return {
       titleRules,
       titleVal,
       contentVal,
       contentRules,
       onFormSubmit,
-      handFileChange
+      handFileChange,
+      beforeUpload,
+      onFileUploaded
     }
   }
 })
