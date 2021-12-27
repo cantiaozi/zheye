@@ -1,6 +1,6 @@
 <template>
   <div class="file-upload">
-    <div class="file-upload-container" @click.prevent="triggerUpload">
+    <div class="file-upload-container" @click.prevent="triggerUpload" v-bind="$attrs">
       <slot name="loading" v-if="fileStatus === 'loading'">
         <button class="btn btn-primary" disabled>正在上传...</button>
       </slot>
@@ -41,6 +41,7 @@ export default defineComponent({
       type: Function as PropType<BeforeUploadFunction>
     }
   },
+  inheritAttrs: false,
   emits: ['file-uploaded', 'file-uploaded-error'],
   setup (props, context) {
     const uploadedData = ref(null)

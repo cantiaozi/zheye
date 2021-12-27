@@ -1,16 +1,23 @@
 <template>
   <div class="create-post-page">
     <h4>新建文章</h4>
-    <!-- <input type="file" @change="handFileChange"/> -->
-    <Uploader action="/upload" @file-uploaded="onFileUploaded" >
-      <template #uploaded="dataProps">
-        <img :src="dataProps.uploadedData.data.url" width="500" />
-      </template>
+    <uploader
+      action="/upload"
+      class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
+    >
+      <h2>点击上传头图</h2>
       <template #loading>
-        <h5>上传中</h5>
+        <div class="d-flex">
+          <div class="spinner-border text-secondary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <h2>正在上传</h2>
+        </div>
       </template>
-      <template #default>点击上传了啊</template>
-    </Uploader>
+      <template #uploaded="dataProps">
+        <img :src="dataProps.uploadedData.data.url">
+      </template>
+    </uploader>
     <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">文章标题：</label>
@@ -46,7 +53,6 @@ import ValidateForm from '../components/ValidateForm.vue'
 import Uploader from '../components/Uploader.vue'
 import createMessage from '../components/createMessage'
 import { GlobalDataProps, PostProps, ResponseType, ImageProps } from '../store'
-import axios from 'axios'
 
 export default defineComponent({
   name: 'Login',
@@ -82,19 +88,6 @@ export default defineComponent({
         }
       }
     }
-    const handFileChange = (e: Event) => {
-      const target = e.target as HTMLInputElement
-      const file = (target.files!)[0]
-      const formData = new FormData()
-      formData.append(file.name, file)
-      axios.post('/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(res => {
-        console.log('upload', res)
-      })
-    }
     const beforeUpload = (file: File): boolean => {
       const isJPG = file.type === 'image/jpeg'
       if (!isJPG) {
@@ -111,10 +104,20 @@ export default defineComponent({
       contentVal,
       contentRules,
       onFormSubmit,
-      handFileChange,
       beforeUpload,
       onFileUploaded
     }
   }
 })
 </script>
+<style>
+.create-post-page .file-upload-container {
+  height: 200px;
+  cursor: pointer;
+}
+.create-post-page .file-upload-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>

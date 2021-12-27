@@ -107,6 +107,7 @@ const store = createStore<GlobalDataProps>({
       state.user = {
         isLogin: false
       }
+      delete axios.defaults.headers.common.Authorization
     },
     fetchCurrentUser (state, rawData) {
       state.user = {
