@@ -5,6 +5,7 @@ import ColumnDetail from './views/ColumnDetail.vue'
 import CreatePost from './views/CreatePost.vue'
 import Signup from './views/Signup.vue'
 import store from './store'
+import axios from 'axios'
 
 const history = createWebHistory()
 const router: Router = createRouter({
@@ -45,12 +46,34 @@ const router: Router = createRouter({
   ]
 })
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiredLogin && !store.state.user.isLogin) {
-    next('/login')
-  } else if (to.meta.redirectAlreadyLogin && store.state.user.isLogin) {
-    next('/')
+  const { user, token } = store.state
+  const { requiredLogin, redirectAlreadyLogin } = to.meta
+  if (user.isLogin) {
+    if (redirectAlreadyLogin) {
+      next('/')
+    } else {
+      next()
+    }
   } else {
-    next()
+    if (token) {
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
+      store.dispatch('fetchCurrentUser').then(() => {
+        if (redirectAlreadyLogin) {
+          next('/')
+        } else {
+          next()
+        }
+      }).catch(() => {
+        localStorage.removeItem('token')
+        next('/login')
+      })
+    } else {
+      if (requiredLogin) {
+        next('/login')
+      } else {
+        next()
+      }
+    }
   }
 })
 
