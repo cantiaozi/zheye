@@ -4,6 +4,7 @@
     <uploader
       action="/upload"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
+      :beforeUpload="beforeUpload"
     >
       <h2>点击上传头图</h2>
       <template #loading>
@@ -53,6 +54,7 @@ import ValidateForm from '../components/ValidateForm.vue'
 import Uploader from '../components/Uploader.vue'
 import createMessage from '../components/createMessage'
 import { GlobalDataProps, PostProps, ResponseType, ImageProps } from '../store'
+import beforeUploadCheck, { CheckCondition } from '../helpers'
 
 export default defineComponent({
   name: 'Login',
@@ -62,6 +64,7 @@ export default defineComponent({
     Uploader
   },
   setup () {
+    let imageId = ''
     const titleVal = ref('')
     const router = useRouter()
     const store = useStore<GlobalDataProps>()
@@ -74,29 +77,41 @@ export default defineComponent({
     ]
     const onFormSubmit = (result: boolean) => {
       if (result) {
-        const currentId = store.state.user.column
-        if (currentId) {
+        const { column, _id } = store.state.user
+        if (column) {
           const newPost: PostProps = {
-            _id: new Date().getTime().toString(),
             title: titleVal.value,
             content: contentVal.value,
-            createdAt: new Date().toString(),
-            column: currentId
+            // createdAt: new Date().toString(),
+            column: column,
+            author: _id
           }
-          store.commit('createPost', newPost)
-          router.push(`/column/${currentId}`)
+          if (imageId) {
+            newPost.image = imageId
+          }
+          store.dispatch('createPost', newPost).then(() => {
+            createMessage('发表成功，2秒后跳转到文章', 'success', 2000)
+            router.push(`/column/${column}`)
+          })
         }
       }
     }
     const beforeUpload = (file: File): boolean => {
-      const isJPG = file.type === 'image/jpeg'
-      if (!isJPG) {
-        createMessage('上传图片只能是JPG格式', 'error')
+      const checkCondition: CheckCondition = {
+        fileType: ['image/png'],
+        size: 0.1
       }
-      return isJPG
+      const { passed, error } = beforeUploadCheck(file, checkCondition)
+      if (error === 'fileType') {
+        createMessage('上传图片只能是PNG格式', 'error')
+      } else if (error === 'size') {
+        createMessage('上传图片不能超过1M', 'error')
+      }
+      return passed
     }
     const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
-      createMessage(`上传图片ID ${rawData.data._id}`, 'success')
+      imageId = rawData.data._id!
+      createMessage(`上传图片ID ${imageId}`, 'success')
     }
     return {
       titleRules,
