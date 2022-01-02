@@ -1,3 +1,4 @@
+import { ColumnProps, UserProps } from './store'
 export interface CheckCondition {
   size?: number,
   fileType?: string[]
@@ -21,5 +22,14 @@ export default function beforeUploadCheck (file: File, checkItems: CheckConditio
   return {
     passed: typeValidate && sizeValidate,
     error
+  }
+}
+
+export function addColumnAvatar (data: ColumnProps | UserProps): void {
+  if (!data.avatar) {
+    const parseCol = data as ColumnProps
+    data.avatar = {
+      fitUrl: require(parseCol.title ? '@/assets/column.jpg' : '@/assets/avatar.jpg')
+    }
   }
 }

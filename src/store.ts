@@ -1,24 +1,25 @@
 import axios from 'axios'
 import { Commit, createStore } from 'vuex'
 
+export interface ImageProps {
+  _id?: string,
+  url?: string,
+  createdAt?: string,
+  fitUrl?: string
+}
 export interface UserProps {
   isLogin: boolean,
   _id?: string,
   nickName?: string,
   column?: string,
   email?: string,
-  description?: string
+  description?: string,
+  avatar?: ImageProps
 }
 
 export interface ErrorProps {
   status: boolean,
   message?: string,
-}
-
-export interface ImageProps {
-  _id?: string,
-  url?: string,
-  createdAt?: string
 }
 
 export interface ColumnProps {
@@ -93,6 +94,9 @@ const store = createStore<GlobalDataProps>({
     fetchPosts (state, rawData) {
       state.posts = rawData.list
     },
+    fetchPost (state, rawData) {
+      state.posts = [rawData]
+    },
     setLoading (state, status) {
       state.isLoading = status
     },
@@ -143,6 +147,9 @@ const store = createStore<GlobalDataProps>({
       return dispatch('login', payload).then(() => {
         return dispatch('fetchCurrentUser')
       })
+    },
+    fetchPost ({ commit }, id) {
+      return getAndCommit(`/posts/${id}`, 'fetchPost', commit)
     }
   },
   getters: {
@@ -159,6 +166,11 @@ const store = createStore<GlobalDataProps>({
           return item.column === cid
         })
       }
+    },
+    getCurrentPost: (state) => (id: string) => {
+      return state.posts.find((post) => {
+        return post._id === id
+      })
     }
   }
 })

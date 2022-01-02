@@ -6,6 +6,7 @@ import CreatePost from './views/CreatePost.vue'
 import Signup from './views/Signup.vue'
 import store from './store'
 import axios from 'axios'
+import PostDetail from './views/PostDetail.vue'
 
 const history = createWebHistory()
 const router: Router = createRouter({
@@ -42,6 +43,11 @@ const router: Router = createRouter({
       meta: {
         requiredLogin: true
       }
+    },
+    {
+      path: '/posts/:id',
+      name: 'post',
+      component: PostDetail
     }
   ]
 })
