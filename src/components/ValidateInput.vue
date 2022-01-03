@@ -6,7 +6,6 @@
       :class="{'is-invalid': inputRef.error}"
       v-model="inputRef.val"
       @blur="validateInput"
-      @input="inputChange"
       v-bind="$attrs"
     />
     <textarea type="text"
@@ -15,7 +14,6 @@
       :class="{'is-invalid': inputRef.error}"
       v-model="inputRef.val"
       @blur="validateInput"
-      @input="inputChange"
       v-bind="$attrs"
     />
     <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
@@ -23,7 +21,7 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, onMounted, PropType, reactive } from 'vue'
+import { computed, defineComponent, onMounted, PropType, reactive } from 'vue'
 import { emitter } from './ValidateForm.vue'
 export interface InputRule {
   type: 'required' | 'email' | 'custom',
@@ -42,13 +40,16 @@ export default defineComponent({
   },
   inheritAttrs: false,
   setup (props, context) {
-    const inputChange = (e: KeyboardEvent) => {
-      const val = (e.target as HTMLInputElement).value
-      context.emit('update:modelValue', val)
-    }
     const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
     const inputRef = reactive({
-      val: props.modelValue || '',
+      val: computed({
+        get: () => {
+          return props.modelValue || ''
+        },
+        set: (val) => {
+          context.emit('update:modelValue', val)
+        }
+      }),
       error: false,
       message: ''
     })
@@ -94,8 +95,7 @@ export default defineComponent({
     })
     return {
       inputRef,
-      validateInput,
-      inputChange
+      validateInput
     }
   }
 })

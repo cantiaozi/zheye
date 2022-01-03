@@ -126,7 +126,6 @@ export default defineComponent({
             data: currentPost.image
           }
         }
-        debugger
         titleVal.value = currentPost.title
         contentVal.value = currentPost.content
       })
