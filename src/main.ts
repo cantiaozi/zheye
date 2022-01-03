@@ -9,15 +9,15 @@ axios.interceptors.request.use((config) => {
   store.commit('setLoading', true)
   config.params = {
     ...config.params,
-    icode: '8D22E4B7CADF31AE'
+    icode: '8959D9B27E175063'
   }
   // 其他请求，添加到 body 中
   // 如果是上传文件，添加到 FormData 中
   if (config.data instanceof FormData) {
-    config.data.append('icode', '8D22E4B7CADF31AE')
+    config.data.append('icode', '8959D9B27E175063')
   } else {
   // 普通的 body 对象，添加到 data 中
-    config.data = { ...config.data, icode: '8D22E4B7CADF31AE' }
+    config.data = { ...config.data, icode: '8959D9B27E175063' }
   }
   store.commit('setError', {
     status: false,
