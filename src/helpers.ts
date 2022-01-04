@@ -33,3 +33,30 @@ export function addColumnAvatar (data: ColumnProps | UserProps): void {
     }
   }
 }
+
+interface TestProps {
+  _id: string;
+  name: string;
+}
+interface objectMaps<T> {
+  [index: string]: T
+}
+const testData: TestProps[] = [{ _id: '1', name: 'a' }, { _id: '2', name: 'b' }]
+export const arrToObj = <T extends {_id: string}>(arr: Array<T>) : objectMaps<T> => {
+  return arr.reduce((prev, current) => {
+    if (current._id) {
+      prev[current._id] = current
+    }
+    return prev
+  }, {} as objectMaps<T>)
+}
+const arr = arrToObj(testData)
+console.log('testData', arr)
+
+export const objToArray = <T>(obj: objectMaps<T>): Array<T> => {
+  return Object.keys(obj).map(key => {
+    return obj[key]
+  })
+}
+const obj = objToArray(arr)
+console.log('testData2', obj)

@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { Commit, createStore } from 'vuex'
+import { arrToObj, objToArray } from './helpers'
 
 export interface ImageProps {
   _id?: string,
@@ -40,10 +41,14 @@ export interface PostProps {
   column: string;
   author?: string | UserProps;
 }
+
+interface listProps<T> {
+  [id: string]: T
+}
 export interface GlobalDataProps {
   user: UserProps
-  columns: ColumnProps[]
-  posts: PostProps[]
+  columns: listProps<ColumnProps>
+  posts: listProps<PostProps>
   isLoading: boolean,
   token: string,
   error: ErrorProps
@@ -78,8 +83,8 @@ const store = createStore<GlobalDataProps>({
       _id: '',
       column: ''
     },
-    columns: [],
-    posts: [],
+    columns: {},
+    posts: {},
     isLoading: false,
     token: localStorage.getItem('token') || '',
     error: {
@@ -88,33 +93,25 @@ const store = createStore<GlobalDataProps>({
   },
   mutations: {
     createPost (state, newPost) {
-      state.posts.push(newPost)
+      state.posts[newPost._id] = newPost
     },
     updatePost (state, newPost) {
-      state.posts = state.posts.map(post => {
-        if (post._id === newPost.data._id) {
-          return newPost.data
-        } else {
-          return post
-        }
-      })
+      state.posts[newPost.data._id] = newPost
     },
     deletePost (state, rawData) {
-      state.posts = state.posts.filter(post => {
-        return post._id !== rawData.data._id
-      })
+      delete state.posts[rawData.data._id]
     },
     fetchColumns (state, rawData) {
-      state.columns = rawData.list
+      state.columns = arrToObj(rawData.list)
     },
     fetchColumn (state, rawData) {
-      state.columns = [rawData]
+      state.columns[rawData._id] = rawData
     },
     fetchPosts (state, rawData) {
-      state.posts = rawData.list
+      state.posts = arrToObj<Required<PostProps>>(rawData.list)
     },
     fetchPost (state, rawData) {
-      state.posts = [rawData]
+      state.posts[rawData._id] = rawData
     },
     setLoading (state, status) {
       state.isLoading = status
@@ -185,22 +182,21 @@ const store = createStore<GlobalDataProps>({
   getters: {
     getColumnById (state) {
       return (id: string) : ColumnProps | undefined => {
-        return state.columns.find(item => {
-          return item._id === id
-        })
+        return state.columns[id]
       }
     },
     getPostsByCId (state) {
       return (cid: string) : PostProps[] => {
-        return state.posts.filter(item => {
+        return objToArray(state.posts).filter(item => {
           return item.column === cid
         })
       }
     },
     getCurrentPost: (state) => (id: string) => {
-      return state.posts.find((post) => {
-        return post._id === id
-      })
+      return state.posts[id]
+    },
+    getColumnArray: (state) => {
+      return objToArray(state.columns)
     }
   }
 })
