@@ -4,7 +4,7 @@
       title="确认删除？"
       :visible="modalVisible"
       @modal-on-cancel="modalVisible = false"
-      @modal-on-confirm="modalVisible = false"
+      @modal-on-confirm="hideAndDelete"
     >
       <p>您确认要删除该文章吗？</p>
     </Modal>
@@ -36,10 +36,11 @@
 import { defineComponent, onMounted, computed, ref } from 'vue'
 import MarkdownIt from 'markdown-it'
 import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
-import { GlobalDataProps, PostProps, ImageProps, UserProps } from '../store'
+import { useRoute, useRouter } from 'vue-router'
+import { GlobalDataProps, PostProps, ImageProps, UserProps, ResponseType } from '../store'
 import UserProfile from '../components/UserProfile.vue'
 import Modal from '../components/Modal.vue'
+import createMessage from '@/components/createMessage'
 
 export default defineComponent({
   name: 'post-detail',
@@ -50,6 +51,7 @@ export default defineComponent({
   setup () {
     const store = useStore<GlobalDataProps>()
     const route = useRoute()
+    const router = useRouter()
     const currentId = route.params.id
     const md = new MarkdownIt()
     onMounted(() => {
@@ -81,12 +83,22 @@ export default defineComponent({
       }
     })
     const modalVisible = ref<boolean>(false)
+    const hideAndDelete = () => {
+      modalVisible.value = false
+      store.dispatch('deletePost', currentId).then((rawData: ResponseType<PostProps>) => {
+        createMessage('文章删除成功，2s后跳转', 'success', 2000)
+        setTimeout(() => {
+          router.push(`/column/${rawData.data.column}`)
+        }, 2000)
+      })
+    }
     return {
       currentPost,
       currentImageUrl,
       currentHTML,
       showEditArea,
-      modalVisible
+      modalVisible,
+      hideAndDelete
     }
   }
 })

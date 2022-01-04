@@ -67,7 +67,7 @@ const postAndCommit = async (url: string, mutationName: string, commit: Commit, 
 const asyncAndCommit = async (url: string, mutationName: string, commit: Commit, config: AxiosRequestConfig = { method: 'get' }) => {
   const response = await axios(url, config)
   commit(mutationName, response.data)
-  return response
+  return response.data
 }
 
 const store = createStore<GlobalDataProps>({
@@ -97,6 +97,11 @@ const store = createStore<GlobalDataProps>({
         } else {
           return post
         }
+      })
+    },
+    deletePost (state, rawData) {
+      state.posts = state.posts.filter(post => {
+        return post._id !== rawData.data._id
       })
     },
     fetchColumns (state, rawData) {
@@ -158,6 +163,11 @@ const store = createStore<GlobalDataProps>({
       return asyncAndCommit(`/posts/${id}`, 'updatePost', commit, {
         method: 'patch',
         data: payload
+      })
+    },
+    deletePost ({ commit }, id) {
+      return asyncAndCommit(`/posts/${id}`, 'deletePost', commit, {
+        method: 'delete'
       })
     },
     fetchCurrentUser ({ commit }) {
