@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { Commit, createStore } from 'vuex'
 
 export interface ImageProps {
@@ -64,6 +64,11 @@ const postAndCommit = async (url: string, mutationName: string, commit: Commit, 
   commit(mutationName, response.data)
   return response
 }
+const asyncAndCommit = async (url: string, mutationName: string, commit: Commit, config: AxiosRequestConfig = { method: 'get' }) => {
+  const response = await axios(url, config)
+  commit(mutationName, response.data)
+  return response
+}
 
 const store = createStore<GlobalDataProps>({
   state: {
@@ -84,6 +89,15 @@ const store = createStore<GlobalDataProps>({
   mutations: {
     createPost (state, newPost) {
       state.posts.push(newPost)
+    },
+    updatePost (state, newPost) {
+      state.posts = state.posts.map(post => {
+        if (post._id === newPost.data._id) {
+          return newPost.data
+        } else {
+          return post
+        }
+      })
     },
     fetchColumns (state, rawData) {
       state.columns = rawData.list
@@ -139,6 +153,12 @@ const store = createStore<GlobalDataProps>({
     },
     createPost ({ commit }, payload) {
       return postAndCommit('/posts', 'createPost', commit, payload)
+    },
+    updatePost ({ commit }, { id, payload }) {
+      return asyncAndCommit(`/posts/${id}`, 'updatePost', commit, {
+        method: 'patch',
+        data: payload
+      })
     },
     fetchCurrentUser ({ commit }) {
       return getAndCommit('/user/current', 'fetchCurrentUser', commit)
